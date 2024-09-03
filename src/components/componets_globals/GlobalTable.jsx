@@ -1,3 +1,4 @@
+// GlobalTable.jsx
 import React, { useState, useEffect } from 'react';
 import {
   Table,
@@ -111,14 +112,14 @@ const GlobalTable = ({
   
     return item[column] !== undefined && item[column] !== null ? item[column] : 'N/A';
   };
-  
 
+  // Filtrar datos por término de búsqueda
   const filteredData = paginatedData.filter((item) => {
     const searchTermLower = searchTerm ? searchTerm.toLowerCase() : '';
-    return (
-      (item.nombre && item.nombre.toLowerCase().includes(searchTermLower)) ||
-      item.id.toString().includes(searchTermLower)
-    );
+    return columns.some(column => {
+      const cellValue = renderCell(item, column).toString().toLowerCase();
+      return cellValue.includes(searchTermLower);
+    });
   });
 
   //console.log('Filtered data:', filteredData); // Debugging output
