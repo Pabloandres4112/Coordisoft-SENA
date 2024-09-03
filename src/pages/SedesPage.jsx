@@ -5,48 +5,39 @@ import UpdateSede from '../components/sedes/UpdateSede';
 import DeleteSede from '../components/sedes/DeleteSede';
 import CardComponent from '../components/CardComponent';
 
-export const SedesPage = () => {
+const UserPage = () => {
+  const columns = ["id", "username", "email"];  // Asegúrate de que estos nombres coincidan con las claves de respuesta de la API
   const [searchTerm, setSearchTerm] = useState(''); // Agregar estado para searchTerm
-  const [refreshTable, setRefreshTable] = useState(false);
+  const [refreshTable, setRefreshTable] = useState(false); // Estado para desencadenar la actualización de la tabla
 
-  const columns = [
-    'id',
-    'nombre_sede',
-    'centro_sede_nombre',
-    'direccion_sede',
-    'date_created',
-    'date_modified',
-  ];
+  const dataEndpoint = "auth/users/";
 
   const handleRefresh = () => {
     setRefreshTable(prev => !prev); // Cambiar el estado para refrescar la tabla
   };
 
   return (
-    <main className='w-full p-3 h-screen'>
-      <div className='my-5 flex flex-col py-5'>
-        <CardComponent title="Modulo Sedes"/>
-        <RegisterSede onRegisterSuccess={handleRefresh} /> {/* Pasar la función para refrescar */}
-        <div className='w-full flex  mt-5'>
-            <input 
-              type="text" 
-              placeholder='Buscar movimientos...' 
-              className='h-[40px] border-gray-400 border p-3 w-56 rounded-lg text-lg ' 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)} // Actualiza el término de búsqueda
-            />
-        </div>
-        <GlobalTable 
-          columns={columns} 
-          dataEndpoint="sede/" 
-          searchTerm={searchTerm} // Pasar el término de búsqueda
-          updateComponent={UpdateSede}
-          deleteComponent={DeleteSede}
-          refreshTrigger={refreshTable} // Pasar el trigger de refresco
+    <div>
+      <CardComponent title="Módulo Usuarios" />
+      <RegisterUser onRegisterSuccess={handleRefresh} /> {/* Pasa la función de actualización al componente */}
+      <div className='w-full flex mt-5'>
+        <input 
+          type="text" 
+          placeholder='Buscar usuarios...' 
+          className='h-[40px] border-gray-400 border p-3 w-56 rounded-lg text-lg' 
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)} // Actualiza el término de búsqueda
         />
       </div>
-    </main>
+      <GlobalTable 
+        searchTerm={searchTerm} // Pasar el término de búsqueda
+        refreshTrigger={refreshTable} // Pasar el trigger de refresco
+        columns={columns} 
+        dataEndpoint={dataEndpoint} 
+        viewComponent={ViewUserModal} 
+      />
+    </div>
   );
 };
 
-export default SedesPage;
+export default UserPage;

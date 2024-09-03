@@ -1,10 +1,11 @@
+// RegisterUser.jsx
 import React, { useState, useEffect } from "react";
 import { Button, useDisclosure, Input, Select, SelectItem } from "@nextui-org/react";
 import axiosClient from "../../configs/axiosClient";
 import GlobalAlert from "../componets_globals/GlobalAlert";
 import GlobalModal from "../componets_globals/GlobalModal";
 
-export const RegisterUser = () => {
+const RegisterUser = ({ onRegisterSuccess }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   // Estado para todos los campos necesarios para registrar un usuario
@@ -80,13 +81,13 @@ export const RegisterUser = () => {
         last_name: "",
         password: "",
       }); // Limpiar el formulario
+      onRegisterSuccess(); // Llama a la función para refrescar la tabla
       onOpenChange(); // Cierra el modal después de enviar la petición
     } catch (error) {
       console.error("Error al enviar la petición:", error);
 
-     
       if (error.response) {
-        // El servidor respondió con un estado fuera del rango 
+        // El servidor respondió con un estado fuera del rango 2xx
         console.error("Error de respuesta del servidor:", error.response.data);
         GlobalAlert.error("Hubo un error al registrar el usuario. " + (error.response.data?.message || "Error interno del servidor."));
       } else if (error.request) {
@@ -157,7 +158,7 @@ export const RegisterUser = () => {
                 type="text"
                 label="Teléfono"
                 placeholder="Ingrese el teléfono"
-                value={userData.Telefono_persona}
+                value={userData.Teléfono_persona}
                 onChange={handleInputChange}
                 required
               />
@@ -165,12 +166,12 @@ export const RegisterUser = () => {
                 label="Selecciona un rol"
                 placeholder="Seleccione un rol"
                 value={userData.Rol_persona}
-                onChange={handleRoleChange} // Usar la función específica para cambiar roles
+                onChange={handleRoleChange}
                 className="w-full"
                 required
               >
                 {roles.map((rol) => (
-                  <SelectItem key={rol.id} value={rol.id}> {/* Asegúrate de que el valor es primitivo */}
+                  <SelectItem key={rol.id} value={rol.id}>
                     {rol.name_rol}
                   </SelectItem>
                 ))}
@@ -205,18 +206,11 @@ export const RegisterUser = () => {
                 onChange={handleInputChange}
                 required
               />
-              {error && <p className="text-red-500">{error}</p>}
-              <Button color="primary" type="submit">
-                Registrar
-              </Button>
+              {error && <div className="text-red-500">{error}</div>}
+              <Button type="submit">Registrar</Button>
             </div>
           </form>
         }
-        footer={() => (
-          <Button color="danger" variant="light" onPress={onOpenChange}>
-            Cerrar
-          </Button>
-        )}
       />
     </div>
   );

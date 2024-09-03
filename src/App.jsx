@@ -29,7 +29,7 @@ export const App = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        <Route path="/home" element={
+        <Route path="/home/" element={
           <ProtectedRoute>
             <WithSidebar>
               <Suspense fallback={<div>Loading...</div>}>

@@ -54,7 +54,7 @@ export const Navbar2 = ({ title }) => {
           </NavbarBrand>
           <NavbarContent className="hidden sm:flex gap-4">
             <NavbarItem>
-              <Link href="/home" className={getLinkClasses('/home')}>
+              <Link href="/home/" className={getLinkClasses('/home')}>
                 Dashboard
               </Link>
             </NavbarItem>
@@ -91,9 +91,9 @@ export const Navbar2 = ({ title }) => {
               <div className="text-red-500">{error}</div> // Muestra el error si hay
             ) : (
               <User
-                name={user.username} // Asegúrate de que 'username' esté presente en la respuesta
-                description={user.name_rol || 'Usuario'} // Asegúrate de que 'Rol_persona' esté presente
-                avatarSrc={user.avatar || "https://via.placeholder.com/150"} // Asegúrate de que 'avatar' esté presente
+                name={user.username} 
+                description={user.name_rol || 'Usuario'} 
+                avatarSrc={user.avatar || "https://via.placeholder.com/150"} 
                 bordered
                 as="button"
                 size="sm"
