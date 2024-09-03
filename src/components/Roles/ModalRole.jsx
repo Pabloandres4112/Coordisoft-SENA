@@ -1,25 +1,20 @@
 import React, { useState } from 'react';
-import { Input, Button, Switch, Spacer } from '@nextui-org/react';
+import { Input, Button, Switch } from '@nextui-org/react';
 import GlobalModal from '../componets_globals/GlobalModal';
 import GlobalAlert from '../componets_globals/GlobalAlert';
 import axiosClient from '../../configs/axiosClient';
 
 const RegistroElementoMaterial = ({ isOpen, onOpenChange, onRegisterSuccess }) => {
   const [formData, setFormData] = useState({
-    sitio: '',
-    CodigoSena_Material: '',
-    Categoria_Material: '',
-    Tipo_Material: '',
-    Nombre_Material: '',
-    Descripcion_Material: '',
-    stock: '',
-    unidad_medida: '',
-    producto_perecedero: false,
-    FechaDevencimiento: '',
+    name_rol: '',
+    slug: '',
+    description: '',
+    state_rol: false,
   });
 
   const [loading, setLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [additionalOptions, setAdditionalOptions] = useState([false]); // Maneja múltiples switches
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -29,10 +24,25 @@ const RegistroElementoMaterial = ({ isOpen, onOpenChange, onRegisterSuccess }) =
     });
   };
 
+  const handleSwitchChange = (index) => (e) => {
+    const newSwitches = [...additionalOptions];
+    newSwitches[index] = e.target.checked;
+    setAdditionalOptions(newSwitches);
+  };
+
+  const handleAddSwitch = () => {
+    if (additionalOptions.length < 4) {
+      setAdditionalOptions([...additionalOptions, false]);
+    }
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      await axiosClient.post('/elemento_material/', formData);
+      await axiosClient.post('/rol/', {
+        ...formData,
+        additionalOptions,
+      });
       GlobalAlert.success('Elemento creado exitosamente');
       onRegisterSuccess();
       onOpenChange(false);
@@ -56,87 +66,37 @@ const RegistroElementoMaterial = ({ isOpen, onOpenChange, onRegisterSuccess }) =
       )}
     >
       <Input
-        label="Sitio"
-        name="sitio"
-        value={formData.sitio}
+        label="Nombre del Rol"
+        name="name_rol"
+        value={formData.name_rol}
         onChange={handleChange}
-        placeholder="Ingrese el sitio"
+        placeholder="Ingrese el nombre del rol"
         fullWidth
       />
       <Input
-        label="Código SENA Material"
-        name="CodigoSena_Material"
-        value={formData.CodigoSena_Material}
+        label="Slug"
+        name="slug"
+        value={formData.slug}
         onChange={handleChange}
-        placeholder="Ingrese el código SENA"
+        placeholder="Ingrese el slug"
         fullWidth
       />
       <Input
-        label="Categoría Material"
-        name="Categoria_Material"
-        value={formData.Categoria_Material}
+        label="Descripción"
+        name="description"
+        value={formData.description}
         onChange={handleChange}
-        placeholder="Ingrese la categoría del material"
-        fullWidth
-      />
-      <Input
-        label="Tipo Material"
-        name="Tipo_Material"
-        value={formData.Tipo_Material}
-        onChange={handleChange}
-        placeholder="Ingrese el tipo de material"
-        fullWidth
-      />
-      <Input
-        label="Nombre Material"
-        name="Nombre_Material"
-        value={formData.Nombre_Material}
-        onChange={handleChange}
-        placeholder="Ingrese el nombre del material"
-        fullWidth
-      />
-      <Input
-        label="Descripción Material"
-        name="Descripcion_Material"
-        value={formData.Descripcion_Material}
-        onChange={handleChange}
-        placeholder="Ingrese una descripción del material"
+        placeholder="Ingrese una descripción"
         fullWidth
         multiline
         rows={3}
       />
-      <Input
-        label="Stock"
-        name="stock"
-        type="number"
-        value={formData.stock}
-        onChange={handleChange}
-        placeholder="Ingrese el stock"
-        fullWidth
-      />
-      <Input
-        label="Unidad Medida"
-        name="unidad_medida"
-        value={formData.unidad_medida}
-        onChange={handleChange}
-        placeholder="Ingrese la unidad de medida"
-        fullWidth
-      />
       <Switch
-        checked={formData.producto_perecedero}
-        onChange={(e) => setFormData({ ...formData, producto_perecedero: e.target.checked })}
+        checked={formData.state_rol}
+        onChange={(e) => setFormData({ ...formData, state_rol: e.target.checked })}
       >
-        Producto Perecedero
+        Estado del Rol
       </Switch>
-      <Input
-        label="Fecha de Vencimiento"
-        name="FechaDevencimiento"
-        type="date"
-        value={formData.FechaDevencimiento}
-        onChange={handleChange}
-        placeholder="Ingrese la fecha de vencimiento"
-        fullWidth
-      />
       <Button auto flat onClick={() => setIsExpanded(!isExpanded)} css={{ mt: '$4' }}>
         {isExpanded ? 'Ocultar Opciones Adicionales' : 'Mostrar Opciones Adicionales'}
       </Button>
@@ -144,7 +104,20 @@ const RegistroElementoMaterial = ({ isOpen, onOpenChange, onRegisterSuccess }) =
       {isExpanded && (
         <div style={{ marginTop: '1rem' }}>
           <h4>Opciones Adicionales</h4>
-          {/* Aquí puedes agregar opciones adicionales si es necesario */}
+          {additionalOptions.map((isChecked, index) => (
+            <Switch
+              key={index}
+              checked={isChecked}
+              onChange={handleSwitchChange(index)}
+            >
+              Opción Adicional {index + 1}
+            </Switch>
+          ))}
+          {additionalOptions.length < 4 && (
+            <Button auto flat css={{ mt: '$4' }} onClick={handleAddSwitch}>
+              Agregar Opción Adicional
+            </Button>
+          )}
         </div>
       )}
     </GlobalModal>

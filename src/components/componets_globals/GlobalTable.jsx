@@ -1,25 +1,17 @@
-// GlobalTable.jsx
 import React, { useState, useEffect } from 'react';
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableColumn,
-  TableRow,
-  TableCell,
-  Pagination
-} from "@nextui-org/react";
+import { Table, TableHeader, TableBody, TableColumn, TableRow, TableCell, Pagination } from "@nextui-org/react";
 import axiosClient from '../../configs/axiosClient';
 import { FaEye } from 'react-icons/fa';
 
-const GlobalTable = ({ 
-  columns, 
-  dataEndpoint, 
-  searchTerm, 
-  updateComponent: UpdateComponent, 
-  deleteComponent: DeleteComponent, 
+const GlobalTable = ({
+  columns,
+  dataEndpoint,
+  searchTerm,
+  updateComponent: UpdateComponent,
+  deleteComponent: DeleteComponent,
   viewComponent: ViewComponent,  // Prop for view modal
-  refreshTrigger 
+  refreshTrigger,
+  columnNames = {}  // Add this prop to accept column names mapping
 }) => {
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
@@ -85,7 +77,6 @@ const GlobalTable = ({
   };
 
   const renderCell = (item, column) => {
-    // Mapeo de propiedades específicas
     const propertyMappings = {
       'sede_area': item.sede_area?.nombre_sede || 'Sin nombre',
       'area_AreaSede': item.area_AreaSede?.nombre_area || 'Sin nombre',
@@ -100,16 +91,16 @@ const GlobalTable = ({
       'programa.nombre_programa': item.programa?.nombre_programa || 'N/A',
       'programa.area_programa.nombre_area': item.programa?.area_programa?.nombre_area || 'N/A',
     };
-  
+
     if (column in propertyMappings) {
       return propertyMappings[column];
     }
-  
+
     if (column === 'date_created' || column === 'date_modified') {
       const date = new Date(item[column]);
       return !isNaN(date) ? date.toLocaleDateString() : 'Fecha no disponible';
     }
-  
+
     return item[column] !== undefined && item[column] !== null ? item[column] : 'N/A';
   };
 
@@ -121,8 +112,6 @@ const GlobalTable = ({
       return cellValue.includes(searchTermLower);
     });
   });
-
-  //console.log('Filtered data:', filteredData); // Debugging output
 
   return (
     <div>
@@ -149,7 +138,9 @@ const GlobalTable = ({
           <Table aria-label="Example table with pagination">
             <TableHeader>
               {columns.map((column, index) => (
-                <TableColumn key={index}>{column}</TableColumn>
+                <TableColumn key={index}>
+                  {columnNames[column] || column} {/* Use the column name mapping */}
+                </TableColumn>
               ))}
               <TableColumn>Acciones</TableColumn>
             </TableHeader>

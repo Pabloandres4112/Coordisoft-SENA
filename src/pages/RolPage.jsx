@@ -25,11 +25,17 @@ const Rol = () => {
 
   // Define the columns for the table
   const columns = ['id', 'name_rol', 'slug', 'description'];
+  const columnNames = {
+    id: 'ID',
+    name_rol: 'Rol',
+    slug: 'palabra clave',
+    description: 'Descripción',
+  };
 
   return (
     <main className='w-full px-7'>
       <div className='my-5 flex flex-col py-5'>
-        <CardComponent title="Modulo Rol" />
+        <CardComponent title="Módulo Rol" /> {/* Corrección de "Modulo Rol" a "Módulo Rol" */}
         <div className='flex justify-end my-3'>
           <Button auto onPress={handleOpenModal}>
             Registrar
@@ -51,8 +57,13 @@ const Rol = () => {
           updateComponent={ActualizarRol} 
           deleteComponent={DeleteRol} 
           refreshTrigger={refreshTable} 
+          columnNames={columnNames}  // Pasar el mapeo de nombres de columnas
         />
-        <RegistroRol isOpen={isModalOpen} onOpenChange={handleCloseModal} onRegisterSuccess={handleRefresh} />
+        <RegistroRol 
+          isOpen={isModalOpen} 
+          onOpenChange={handleCloseModal} 
+          onRegisterSuccess={handleRefresh} 
+        />
       </div>
     </main>
   );
