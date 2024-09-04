@@ -4,8 +4,7 @@ import axiosClient from "../../configs/axiosClient";
 import GlobalAlert from "../componets_globals/GlobalAlert";
 import GlobalModal from "../componets_globals/GlobalModal";
 
-
-export const RegisterArea = () => {
+export const RegisterArea = ({ onRegisterSuccess }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [nombreArea, setNombreArea] = useState("");
   const [error, setError] = useState("");
@@ -32,6 +31,12 @@ export const RegisterArea = () => {
       GlobalAlert.success("Área registrada correctamente.");
       setNombreArea(""); // Limpiar el input
       onClose(); // Cierra el modal después de enviar la petición
+
+      // Llamar al callback después del registro exitoso
+      if (onRegisterSuccess) {
+        onRegisterSuccess();
+      }
+
     } catch (error) {
       console.error("Error al enviar la petición:", error);
       GlobalAlert.error("Hubo un error al registrar el área. " + (error.response?.data?.message || "Error interno del servidor."));

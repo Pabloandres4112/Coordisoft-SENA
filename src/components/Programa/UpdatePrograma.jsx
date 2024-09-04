@@ -39,20 +39,16 @@ const UpdatePrograma = ({ item, onClose, refreshData }) => {
       return;
     }
 
-    const selectedAreaObject = areas.find(area => area.id === parseInt(selectedArea));
-
     const data = {
       nombre_programa: nombrePrograma,
-      area_programa: {
-        nombre_area: selectedAreaObject.nombre_area
-      },
+      area_programa: parseInt(selectedArea), // Enviar solo el ID
     };
 
     try {
-      const response = await axiosClient.put(`/programa/${item.id}/`, data);
+      await axiosClient.put(`/programa/${item.id}/`, data);
       GlobalAlert.success("Programa actualizado correctamente.");
-      onClose(); // Close the modal after success
-      if (refreshData) refreshData(); // Refresh data after success
+      onClose();
+      if (refreshData) refreshData();
     } catch (error) {
       console.error("Error al actualizar el programa:", error.response?.data || error);
       GlobalAlert.error(`Hubo un error al actualizar el programa: ${error.response?.data?.detail || "Error desconocido"}`);
