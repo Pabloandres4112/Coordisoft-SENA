@@ -26,6 +26,7 @@ const ElementosPage = () => {
   const [sites, setSites] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [tiposMaterial, setTiposMaterial] = useState([]);
+  const [refreshTable, setRefreshTable] = useState(false); // Estado de refresco de la tabla
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,11 +63,10 @@ const ElementosPage = () => {
     try {
       await axiosClient.post('/elemento_material/', elementoData);
       GlobalAlert.success('Elemento registrado con éxito.');
-      refreshData();
+      setRefreshTable(prev => !prev); // Cambiar el estado de refresco
       setIsOpen(false);
     } catch (error) {
-        console.log('Errores:', error.response.data);
-  
+      console.log('Errores:', error.response.data);
     }
   };
 
@@ -74,7 +74,7 @@ const ElementosPage = () => {
     try {
       await axiosClient.put(`/elemento_material/${item.id}/`, item);
       GlobalAlert.success('Elemento actualizado con éxito.');
-      refreshData();
+      setRefreshTable(prev => !prev); // Cambiar el estado de refresco
     } catch (error) {
       GlobalAlert.error('Error al actualizar el elemento.');
     }
@@ -84,7 +84,7 @@ const ElementosPage = () => {
     try {
       await axiosClient.delete(`/elemento_material/${item.id}/`);
       GlobalAlert.success('Elemento eliminado con éxito.');
-      refreshData();
+      setRefreshTable(prev => !prev); // Cambiar el estado de refresco
     } catch (error) {
       GlobalAlert.error('Error al eliminar el elemento.');
     }
@@ -104,6 +104,15 @@ const ElementosPage = () => {
         nombre_sitio: sitioInfo.nombre_sitio || 'N/A',
       };
     });
+  };
+
+  const columnNames = { 
+    'id': 'ID',
+    'sede_area': 'Sede',
+    'area_AreaSede': 'Área',
+    'persona_administra': 'Administrador',
+    'date_created': 'Creado',
+    'date_modified': 'Modificado',
   };
 
   return (
@@ -139,9 +148,12 @@ const ElementosPage = () => {
           </div>
           <GlobalTable
             columns={[
-              'ID', 'Nombre Material', 'creado', 'modificado', 'Descripcion Material',
-              'Codigo Sena', 'ubicacion', 'Sitio'
+              'id', 'Nombre_Material', 'date_created', 'date_modified', 'Descripcion_Material',
+              'CodigoSena_Material', 'ubicacion', 'nombre_sitio'
             ]}
+            columnNames={columnNames} 
+            refreshTrigger={refreshTable} // Trigger de refresco
+            searchTerm={searchTerm} 
             dataEndpoint="/elemento_material/"
             mapData={mapData}
             updateComponent={({ item, onClose }) => (
@@ -253,7 +265,6 @@ const ElementosPage = () => {
     </SelectItem>
   ))}
 </Select>
-
               <Input
                 label="Nombre Material"
                 placeholder="Ingresa el nombre del material"
@@ -264,7 +275,7 @@ const ElementosPage = () => {
               />
               <Input
                 label="Descripción Material"
-                placeholder="Ingresa la descripción del material"
+                placeholder="Ingresa una descripción del material"
                 name="Descripcion_Material"
                 value={elementoData.Descripcion_Material}
                 onChange={handleChange}
@@ -272,20 +283,25 @@ const ElementosPage = () => {
               />
               <Input
                 label="Stock"
-                placeholder="Ingresa el stock"
+                type="number"
+                placeholder="Ingresa el stock del material"
                 name="stock"
                 value={elementoData.stock}
                 onChange={handleChange}
                 className="w-full"
               />
-              <Input
-                label="Unidad de Medida"
-                placeholder="Ingresa la unidad de medida"
+              <Select
                 name="unidad_medida"
+                label="Unidad de Medida"
+                placeholder="Selecciona una unidad"
+                onChange={(e) => handleSelectChange('unidad_medida', e.target.value)}
                 value={elementoData.unidad_medida}
-                onChange={handleChange}
                 className="w-full"
-              />
+              >
+                <SelectItem value="pieza">Pieza</SelectItem>
+                <SelectItem value="litro">Litro</SelectItem>
+                <SelectItem value="metro">Metro</SelectItem>
+              </Select>
               <Checkbox
                 name="producto_perecedero"
                 checked={elementoData.producto_perecedero}
