@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { RegisterCentro } from '../components/areas/RegisterCentro';
-import GlobalTable from '../components/componets_globals/GlobalTable';
 import UpdateCentro from '../components/areas/UpdateCentro';
 import DeleteCentro from '../components/areas/DeleteCentro';
 import CardComponent from '../components/CardComponent';
+import GlobalTable from '../components/componets_globals/GlobalTable';
 
 export const CentrosPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [refreshTable, setRefreshTable] = useState(false); // Estado para refrescar la tabla
+  const [selectedCentro, setSelectedCentro] = useState(null); // Centro seleccionado para actualizar
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false); // Estado para abrir/cerrar modal de actualización
 
   const columns = [
     'id',
@@ -17,15 +19,26 @@ export const CentrosPage = () => {
     'date_modified',
   ];
   const columnNames = {
-    'id':'ID',
-    'nombre':'Nombre Centro',
-    'municipio_nombre':'Municipio',
-    'date_created':'decha de creacion',
-    'date_modified':'fecha',
+    'id': 'ID',
+    'nombre': 'Nombre Centro',
+    'municipio_nombre': 'Municipio',
+    'date_created': 'Fecha de Creación',
+    'date_modified': 'Fecha de Modificación',
   };
 
   const handleRefresh = () => {
     setRefreshTable(prev => !prev); // Cambiar el estado para refrescar la tabla
+  };
+
+  // Función para manejar la apertura del modal de actualización
+  const handleUpdate = (centro) => {
+    setSelectedCentro(centro); // Seleccionar el centro a actualizar
+    setIsUpdateModalOpen(true); // Abrir el modal
+  };
+
+  const handleCloseModal = () => {
+    setIsUpdateModalOpen(false); // Cerrar el modal
+    setSelectedCentro(null); // Limpiar el centro seleccionado
   };
 
   return (
@@ -47,12 +60,26 @@ export const CentrosPage = () => {
             columns={columns} 
             dataEndpoint="centro/" 
             searchTerm={searchTerm}
-            updateComponent={UpdateCentro}
+            updateComponent={({ item, onClose }) => {
+              setSelectedCentro(item); // Setea el ítem seleccionado
+              setIsUpdateModalOpen(true); // Abre el modal de actualización
+              onClose(); // Cierra el modal de la tabla si es necesario
+            }} // Abrir el modal de actualización
             deleteComponent={DeleteCentro}
             refreshTrigger={refreshTable} // Pasar estado de refresco
           />
         </div>
       </main>
+
+      {/* Modal de actualización */}
+      {selectedCentro && (
+        <UpdateCentro
+          isOpen={isUpdateModalOpen}
+          item={selectedCentro}
+          onOpenChange={setIsUpdateModalOpen}
+          onUpdate={handleRefresh}
+        />
+      )}
     </>
   );
 };
