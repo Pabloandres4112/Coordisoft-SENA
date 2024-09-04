@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "@nextui-org/react";
+import { Button, Select, SelectItem } from "@nextui-org/react";
 import axiosClient from "../../configs/axiosClient";
 import GlobalAlert from "../componets_globals/GlobalAlert";
 import GlobalModal from "../componets_globals/GlobalModal";
@@ -8,9 +8,9 @@ const UpdateAreaSede = ({ item, onClose, refreshData }) => {
   const [sedes, setSedes] = useState([]);
   const [areas, setAreas] = useState([]);
   const [administradores, setAdministradores] = useState([]);
-  const [selectedSede, setSelectedSede] = useState(item.sede_area || "");
-  const [selectedArea, setSelectedArea] = useState(item.area_AreaSede || "");
-  const [selectedAdmin, setSelectedAdmin] = useState(item.persona_administra || "");
+  const [selectedSede, setSelectedSede] = useState("");
+  const [selectedArea, setSelectedArea] = useState("");
+  const [selectedAdmin, setSelectedAdmin] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -19,8 +19,8 @@ const UpdateAreaSede = ({ item, onClose, refreshData }) => {
         const response = await axiosClient.get("sede/");
         setSedes(response.data);
       } catch (error) {
-        console.error("Error fetching sedes:", error);
-        GlobalAlert.error("Error al obtener las sedes.");
+        console.error("Error al obtener las sedes:", error);
+        GlobalAlert.error("Hubo un error al obtener las sedes.");
       }
     };
 
@@ -29,18 +29,18 @@ const UpdateAreaSede = ({ item, onClose, refreshData }) => {
         const response = await axiosClient.get("/area/");
         setAreas(response.data);
       } catch (error) {
-        console.error("Error fetching areas:", error);
-        GlobalAlert.error("Error al obtener las áreas.");
+        console.error("Error al obtener las áreas:", error);
+        GlobalAlert.error("Hubo un error al obtener las áreas.");
       }
     };
 
     const fetchAdministradores = async () => {
       try {
-        const response = await axiosClient.get("auth/users/");
+        const response = await axiosClient.get("/auth/users/");
         setAdministradores(response.data);
       } catch (error) {
-        console.error("Error fetching administrators:", error);
-        GlobalAlert.error("Error al obtener los administradores.");
+        console.error("Error al obtener los administradores:", error);
+        GlobalAlert.error("Hubo un error al obtener los administradores.");
       }
     };
 
@@ -48,6 +48,15 @@ const UpdateAreaSede = ({ item, onClose, refreshData }) => {
     fetchAreas();
     fetchAdministradores();
   }, []);
+
+  // Set the initial values of the selected items when the modal opens
+  useEffect(() => {
+    if (item) {
+      setSelectedSede(item.sede_area || "");
+      setSelectedArea(item.area_AreaSede || "");
+      setSelectedAdmin(item.persona_administra || "");
+    }
+  }, [item]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -58,18 +67,27 @@ const UpdateAreaSede = ({ item, onClose, refreshData }) => {
     }
 
     try {
-      const response = await axiosClient.put(`/areaSede/${item.id}/`, {
+      const payload = {
         sede_area: selectedSede,
         area_AreaSede: selectedArea,
-        persona_administra: selectedAdmin
-      });
-      console.log("Server response:", response.data);
-      GlobalAlert.success("Sede actualizada correctamente.");
+        persona_administra: selectedAdmin,
+      };
+
+      console.log("Enviando payload:", payload);
+
+      if (!item.id) {
+        setError("El ID del área sede no está definido.");
+        return;
+      }
+
+      const response = await axiosClient.put(`/areaSede/${item.id}/`, payload);
+      console.log("Respuesta del servidor:", response.data);
+      GlobalAlert.success("Área-Sede actualizada correctamente.");
       refreshData();
-      onClose();
+      onClose(); // Cierra el modal después de enviar la petición
     } catch (error) {
-      console.error("Error updating area sede:", error);
-      GlobalAlert.error("Error al actualizar la sede. " + (error.response?.data?.message || "Error interno del servidor."));
+      console.error("Error al actualizar el área sede:", error);
+      GlobalAlert.error("Hubo un error al actualizar el Área-Sede.");
     }
   };
 
@@ -77,67 +95,61 @@ const UpdateAreaSede = ({ item, onClose, refreshData }) => {
     <GlobalModal
       isOpen={true}
       onOpenChange={onClose}
-      title="Actualizar Sede"
+      title="Actualizar Área-Sede"
     >
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-4">
-        <label className="block">
-          <span className="text-gray-700">Selecciona una sede</span>
-          <select
-            value={selectedSede}
-            onChange={(e) => setSelectedSede(e.target.value)}
-            className="border w-full rounded-md p-2 focus:outline-none focus:ring focus:border-blue-300"
-            required
-          >
-            <option value="" disabled>Seleccione una sede</option>
-            {sedes.map((sede) => (
-              <option key={sede.id} value={sede.id}>
-                {sede.nombre_sede}
-              </option>
-            ))}
-          </select>
-        </label>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+        <Select
+          label="Selecciona una sede"
+          placeholder="Seleccione una sede"
+          value={selectedSede}
+          onChange={(e) => setSelectedSede(e.target.value)}
+          className="w-full"
+          required
+        >
+          {sedes.map((sede) => (
+            <SelectItem key={sede.id} value={sede.id}>
+              {sede.nombre_sede}
+            </SelectItem>
+          ))}
+        </Select>
 
-        <label className="block">
-          <span className="text-gray-700">Selecciona un área</span>
-          <select
-            value={selectedArea}
-            onChange={(e) => setSelectedArea(e.target.value)}
-            className="border w-full rounded-md p-2 focus:outline-none focus:ring focus:border-blue-300"
-            required
-          >
-            <option value="" disabled>Seleccione un área</option>
-            {areas.map((area) => (
-              <option key={area.id} value={area.id}>
-                {area.nombre_area}
-              </option>
-            ))}
-          </select>
-        </label>
+        <Select
+          label="Selecciona un área"
+          placeholder="Seleccione un área"
+          value={selectedArea}
+          onChange={(e) => setSelectedArea(e.target.value)}
+          className="w-full"
+          required
+        >
+          {areas.map((area) => (
+            <SelectItem key={area.id} value={area.id}>
+              {area.nombre_area}
+            </SelectItem>
+          ))}
+        </Select>
 
-        <label className="block">
-          <span className="text-gray-700">Selecciona un administrador</span>
-          <select
-            value={selectedAdmin}
-            onChange={(e) => setSelectedAdmin(e.target.value)}
-            className="border w-full rounded-md p-2 focus:outline-none focus:ring focus:border-blue-300"
-            required
-          >
-            <option value="" disabled>Seleccione un administrador</option>
-            {administradores.map((admin) => (
-              <option key={admin.id} value={admin.id}>
-                {`${admin.first_name} ${admin.last_name}`}
-              </option>
-            ))}
-          </select>
-        </label>
+        <Select
+          label="Selecciona un administrador"
+          placeholder="Seleccione un administrador"
+          value={selectedAdmin}
+          onChange={(e) => setSelectedAdmin(e.target.value)}
+          className="w-full"
+          required
+        >
+          {administradores.map((admin) => (
+            <SelectItem key={admin.id} value={admin.id}>
+              {`${admin.first_name} ${admin.last_name}`}
+            </SelectItem>
+          ))}
+        </Select>
 
         {error && <p className="text-red-500">{error}</p>}
 
         <Button color="primary" type="submit">
-          Enviar
+          Actualizar
         </Button>
       </form>
-      <Button color="danger" variant="light" onClick={onClose}>
+      <Button color="danger" variant="light" onPress={onClose}>
         Cerrar
       </Button>
     </GlobalModal>

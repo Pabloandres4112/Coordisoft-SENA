@@ -4,7 +4,7 @@ import axiosClient from "../../configs/axiosClient";
 import GlobalAlert from "../componets_globals/GlobalAlert";
 import GlobalModal from "../componets_globals/GlobalModal";
 
-export const RegisterAreaSede = () => {
+export const RegisterAreaSede = ({ onRegisterSuccess }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [sedes, setSedes] = useState([]);
   const [areas, setAreas] = useState([]);
@@ -50,7 +50,7 @@ export const RegisterAreaSede = () => {
     fetchAdministradores();
   }, []);
 
-  const handleSubmit = async (event, onClose) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (!selectedSede || !selectedArea || !selectedAdmin) {
       setError("Todos los campos son obligatorios");
@@ -68,7 +68,10 @@ export const RegisterAreaSede = () => {
       setSelectedSede("");
       setSelectedArea("");
       setSelectedAdmin("");
-      onClose(); // Cierra el modal después de enviar la petición
+      onOpenChange(); // Cierra el modal después de enviar la petición
+      if (onRegisterSuccess) {
+        onRegisterSuccess(); // Refresca la tabla llamando a la función de éxito
+      }
     } catch (error) {
       console.error("Error al enviar la petición:", error);
       GlobalAlert.error("Hubo un error al registrar el Área-Sede.");
@@ -83,7 +86,7 @@ export const RegisterAreaSede = () => {
         onOpenChange={onOpenChange}
         title="Formulario de Área-Sede"
         children={
-          <form onSubmit={(e) => handleSubmit(e, onOpenChange)}>
+          <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-2">
               <Select
                 label="Selecciona una sede"

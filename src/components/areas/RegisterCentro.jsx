@@ -4,7 +4,7 @@ import axiosClient from "../../configs/axiosClient";
 import GlobalAlert from "../componets_globals/GlobalAlert";
 import GlobalModal from "../componets_globals/GlobalModal";
 
-export const RegisterCentro = () => {
+export const RegisterCentro = ({ onSuccess }) => { // Recibir prop onSuccess
   const [isOpen, setIsOpen] = useState(false);
   const [nombre, setNombre] = useState("");
   const [municipios, setMunicipios] = useState([]);
@@ -42,6 +42,7 @@ export const RegisterCentro = () => {
       setNombre("");
       setSelectedMunicipio("");
       setIsOpen(false);
+      if (onSuccess) onSuccess(); // Llamar a la función de éxito
     } catch (error) {
       console.error("Error al registrar el centro:", error);
       GlobalAlert.error("Hubo un error al registrar el centro.");

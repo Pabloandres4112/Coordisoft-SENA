@@ -14,7 +14,20 @@ export const SedeAreasPage = () => {
     'date_created',
     'date_modified'
   ];
+  const columnNames = { 
+    'id': 'ID',
+    'sede_area': 'Sede',
+    'area_AreaSede': 'Área',
+    'persona_administra': 'Administrador',
+    'date_created': 'Creado',
+    'date_modified': 'Modificado',
+  };
+  const [refreshTable, setRefreshTable] = useState(false); 
   const [searchTerm, setSearchTerm] = useState(''); 
+
+  const handleRefresh = () => {
+    setRefreshTable(prev => !prev); 
+  };
 
   return (
     <>
@@ -22,7 +35,7 @@ export const SedeAreasPage = () => {
         <div className='my-5 flex flex-col py-5'>
           
           <CardComponent title="Modulo Area Sede" />
-          <RegisterAreaSede />
+          <RegisterAreaSede onRegisterSuccess={handleRefresh} /> 
           <div className='w-full flex mt-5'>
             <input 
               type="text" 
@@ -35,7 +48,9 @@ export const SedeAreasPage = () => {
           <GlobalTable 
             columns={columns2} 
             dataEndpoint="areaSede/" 
-            searchTerm={searchTerm} // Pasar searchTerm a GlobalTable
+            columnNames={columnNames} 
+            refreshTrigger={refreshTable} 
+            searchTerm={searchTerm} 
             updateComponent={UpdateAreaSede} 
             deleteComponent={DeleteAreaSede} 
           />
@@ -44,3 +59,5 @@ export const SedeAreasPage = () => {
     </>
   );
 };
+
+export default SedeAreasPage;
