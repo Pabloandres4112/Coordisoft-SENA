@@ -139,8 +139,8 @@ const ElementosPage = () => {
           </div>
           <GlobalTable
             columns={[
-              'id', 'Nombre_Material', 'date_created', 'date_modified', 'Descripcion_Material',
-              'CodigoSena_Material', 'ubicacion', 'nombre_sitio'
+              'ID', 'Nombre Material', 'creado', 'modificado', 'Descripcion Material',
+              'Codigo Sena', 'ubicacion', 'Sitio'
             ]}
             dataEndpoint="/elemento_material/"
             mapData={mapData}
