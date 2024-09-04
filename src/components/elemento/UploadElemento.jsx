@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { Button, Input, Select, SelectItem, Checkbox } from '@nextui-org/react';
 import GlobalModal from '../componets_globals/GlobalModal';
 
-const UpdateElementModal = ({ isOpen, onOpenChange, item, onUpdate }) => {
+const UpdateElementModal = ({ isOpen, onOpenChange, item, onUpdate, categorias, tiposMaterial, sites }) => {
   const [updatedData, setUpdatedData] = useState({ ...item });
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setUpdatedData(prevData => ({
+    setUpdatedData((prevData) => ({
       ...prevData,
       [name]: type === 'checkbox' ? checked : value,
     }));
@@ -47,13 +47,26 @@ const UpdateElementModal = ({ isOpen, onOpenChange, item, onUpdate }) => {
           fullWidth
         />
         <Select
+          name="sitio"
+          label="Sitio"
+          placeholder="Selecciona un sitio"
+          className="w-full"
+          onChange={(e) => handleChange({ target: { name: 'sitio', value: e.target.value } })}
+          value={updatedData.sitio}
+        >
+          {sites.map((site) => (
+            <SelectItem key={site.id} value={site.id.toString()}>
+              {site.nombre_sitio}
+            </SelectItem>
+          ))}
+        </Select>
+        <Select
           name="Categoria_Material"
           label="Categoría Material"
           placeholder="Selecciona una categoría"
           onChange={(e) => handleChange({ target: { name: 'Categoria_Material', value: e.target.value } })}
           value={updatedData.Categoria_Material}
         >
-          {/* Asume que categorias está disponible en el contexto o props */}
           {categorias.map((categoria) => (
             <SelectItem key={categoria.id} value={categoria.id.toString()}>
               {categoria.nombre_categoria}
@@ -67,7 +80,6 @@ const UpdateElementModal = ({ isOpen, onOpenChange, item, onUpdate }) => {
           onChange={(e) => handleChange({ target: { name: 'Tipo_Material', value: e.target.value } })}
           value={updatedData.Tipo_Material}
         >
-          {/* Asume que tiposMaterial está disponible en el contexto o props */}
           {tiposMaterial.map((tipo) => (
             <SelectItem key={tipo.id} value={tipo.id.toString()}>
               {tipo.tipo_elemento}
