@@ -14,6 +14,7 @@ import MunicipioPage from './pages/MunicipioPage';
 import FichaPage from './pages/FichaPage';
 import ProgramaPage from './pages/ProgramasPage';
 import Rol from './pages/RolPage';
+import SitioPage from './pages/SitioPage';
 
 // Lazy load the pages
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -175,6 +176,15 @@ export const App = () => {
             </WithSidebar>
           </ProtectedRoute>
         } />
+         <Route path="/Sitios" element={
+          <ProtectedRoute>
+            <WithSidebar>
+              <Suspense fallback={<div>Loading...</div>}>
+                <SitioPage /> {/* Corregido el nombre del componente */}
+              </Suspense>
+            </WithSidebar>
+          </ProtectedRoute>
+        } />
       </Routes>
       
     </BrowserRouter>
@@ -197,6 +207,7 @@ const WithSidebar = ({ children }) => (
         <SidebarItem nav="/fichas" icon={<Clipboard  size={20} />} text="Fichas" />
         <SidebarItem nav="/programa" icon={<Layers    size={20} />} text="Programa" />
         <SidebarItem nav="/roles" icon={<User size={20} />} text="Roles" />
+        <SidebarItem nav="/sitios" icon={<MapPin size={20} />} text="Sitios" />
       </SidebarAccordion>
       <SidebarAccordion icon={<Box size={20} />} text="Bodega">
         <SidebarItem nav="/elementos" icon={<Package size={20} />} text="Elementos" />

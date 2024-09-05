@@ -58,6 +58,7 @@ export const CentrosPage = () => {
           </div>
           <GlobalTable 
             columns={columns} 
+            columnNames={columnNames}
             dataEndpoint="centro/" 
             searchTerm={searchTerm}
             updateComponent={({ item, onClose }) => {
