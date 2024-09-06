@@ -129,19 +129,19 @@ const UpdateAreaSede = ({ item, onClose, refreshData }) => {
         </Select>
 
         <Select
-          label="Selecciona un administrador"
-          placeholder="Seleccione un administrador"
-          value={selectedAdmin}
-          onChange={(e) => setSelectedAdmin(e.target.value)}
-          className="w-full"
-          required
-        >
-          {administradores.map((admin) => (
-            <SelectItem key={admin.id} value={admin.id}>
-              {`${admin.first_name} ${admin.last_name}`}
-            </SelectItem>
-          ))}
-        </Select>
+            label="Selecciona un administrador"
+            placeholder="Selecciona un administrador"
+            value={selectedAdmin}
+            onChange={(e) => setSelectedAdmin(e.target.value)}
+            className="w-full"
+            required
+          >
+            {administradores.map((admin) => (
+              <SelectItem key={admin.id} value={admin.id.toString()}>
+                {admin.username}
+              </SelectItem>
+            ))}
+          </Select>
 
         {error && <p className="text-red-500">{error}</p>}
 

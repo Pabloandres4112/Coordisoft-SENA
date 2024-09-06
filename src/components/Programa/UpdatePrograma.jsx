@@ -3,9 +3,10 @@ import { Button, Select, SelectItem, Input } from "@nextui-org/react";
 import axiosClient from "../../configs/axiosClient";
 import GlobalAlert from "../componets_globals/GlobalAlert";
 import GlobalModal from "../componets_globals/GlobalModal";
+import { useDisclosure } from "@nextui-org/react";
 
 const UpdatePrograma = ({ item, onClose, refreshData }) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const { isOpen, onOpen, onClose: closeModal } = useDisclosure();
   const [nombrePrograma, setNombrePrograma] = useState("");
   const [areas, setAreas] = useState([]);
   const [selectedArea, setSelectedArea] = useState("");
@@ -29,8 +30,9 @@ const UpdatePrograma = ({ item, onClose, refreshData }) => {
     if (item) {
       setNombrePrograma(item.nombre_programa || "");
       setSelectedArea(item.area_programa?.id?.toString() || "");
+      onOpen(); // Open the modal when item changes
     }
-  }, [item]);
+  }, [item, onOpen]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -47,8 +49,10 @@ const UpdatePrograma = ({ item, onClose, refreshData }) => {
     try {
       await axiosClient.put(`/programa/${item.id}/`, data);
       GlobalAlert.success("Programa actualizado correctamente.");
-      onClose();
-      if (refreshData) refreshData();
+      setNombrePrograma(""); // Clear the input field
+      setSelectedArea(""); // Clear the selected area
+      closeModal(); // Close the modal
+      if (refreshData) refreshData(); // Trigger a refresh if provided
     } catch (error) {
       console.error("Error al actualizar el programa:", error.response?.data || error);
       GlobalAlert.error(`Hubo un error al actualizar el programa: ${error.response?.data?.detail || "Error desconocido"}`);
@@ -58,7 +62,7 @@ const UpdatePrograma = ({ item, onClose, refreshData }) => {
   return (
     <GlobalModal
       isOpen={isOpen}
-      onOpenChange={() => setIsOpen(!isOpen)}
+      onOpenChange={closeModal} // Use closeModal to toggle the visibility
       title="Actualizar Programa"
       children={
         <form onSubmit={handleSubmit}>
@@ -92,7 +96,7 @@ const UpdatePrograma = ({ item, onClose, refreshData }) => {
         </form>
       }
       footer={() => (
-        <Button color="danger" variant="light" onClick={onClose}>
+        <Button color="danger" variant="light" onClick={closeModal}>
           Cerrar
         </Button>
       )}

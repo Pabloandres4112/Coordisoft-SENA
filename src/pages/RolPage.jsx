@@ -36,7 +36,7 @@ const Rol = () => {
     <main className='w-full px-7'>
       <div className='my-5 flex flex-col py-5'>
         <CardComponent title="Módulo Rol" /> {/* Corrección de "Modulo Rol" a "Módulo Rol" */}
-        <div className='flex justify-end my-3'>
+        <div className='flex  my-3'>
           <Button auto onPress={handleOpenModal}>
             Registrar
           </Button>

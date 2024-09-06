@@ -79,73 +79,71 @@ export const RegisterAreaSede = ({ onRegisterSuccess }) => {
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-4">
       <Button onPress={onOpen} className="max-w-fit">Registrar Área-Sede</Button>
       <GlobalModal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         title="Formulario de Área-Sede"
-        children={
-          <form onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-2">
-              <Select
-                label="Selecciona una sede"
-                placeholder="Seleccione una sede"
-                value={selectedSede}
-                onChange={(e) => setSelectedSede(e.target.value)}
-                className="w-full"
-                required
-              >
-                {sedes.map((sede) => (
-                  <SelectItem key={sede.id} value={sede.id}>
-                    {sede.nombre_sede}
-                  </SelectItem>
-                ))}
-              </Select>
+      >
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <Select
+            label="Selecciona una sede"
+            placeholder="Seleccione una sede"
+            value={selectedSede}
+            onChange={(e) => setSelectedSede(e.target.value)}
+            className="w-full"
+            required
+          >
+            {sedes.map((sede) => (
+              <SelectItem key={sede.id} value={sede.id}>
+                {sede.nombre_sede}
+              </SelectItem>
+            ))}
+          </Select>
 
-              <Select
-                label="Selecciona un área"
-                placeholder="Seleccione un área"
-                value={selectedArea}
-                onChange={(e) => setSelectedArea(e.target.value)}
-                className="w-full"
-                required
-              >
-                {areas.map((area) => (
-                  <SelectItem key={area.id} value={area.id}>
-                    {area.nombre_area}
-                  </SelectItem>
-                ))}
-              </Select>
+          <Select
+            label="Selecciona un área"
+            placeholder="Seleccione un área"
+            value={selectedArea}
+            onChange={(e) => setSelectedArea(e.target.value)}
+            className="w-full"
+            required
+          >
+            {areas.map((area) => (
+              <SelectItem key={area.id} value={area.id}>
+                {area.nombre_area}
+              </SelectItem>
+            ))}
+          </Select>
 
-              <Select
-                label="Selecciona un administrador"
-                placeholder="Seleccione un administrador"
-                value={selectedAdmin}
-                onChange={(e) => setSelectedAdmin(e.target.value)}
-                className="w-full"
-                required
-              >
-                {administradores.map((admin) => (
-                  <SelectItem key={admin.id} value={admin.id}>
-                    {`${admin.first_name} ${admin.last_name}`}
-                  </SelectItem>
-                ))}
-              </Select>
+          <Select
+            label="Selecciona un administrador"
+            placeholder="Selecciona un administrador"
+            value={selectedAdmin}
+            onChange={(e) => setSelectedAdmin(e.target.value)}
+            className="w-full"
+            required
+          >
+            {administradores.map((admin) => (
+              <SelectItem key={admin.id} value={admin.id.toString()}>
+                {admin.username}
+              </SelectItem>
+            ))}
+          </Select>
 
-              {error && <p className="text-red-500">{error}</p>}
-              <Button color="primary" type="submit">
-                Enviar
-              </Button>
-            </div>
-          </form>
-        }
-        footer={() => (
+          {error && <p className="text-red-500">{error}</p>}
+          <Button color="primary" type="submit" className="w-full">
+            Enviar
+          </Button>
+        </form>
+
+        <div className="flex justify-end mt-4">
           <Button color="danger" variant="light" onPress={onOpenChange}>
             Cerrar
           </Button>
-        )}
-      />
+        </div>
+      </GlobalModal>
     </div>
   );
 };

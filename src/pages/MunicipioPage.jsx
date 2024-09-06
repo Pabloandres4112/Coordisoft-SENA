@@ -22,6 +22,7 @@ export const MunicipioPage = () => {
   ];
 
 
+
   const handleRefresh = () => {
     setRefreshTable(prev => !prev); // Toggle the refresh state
   };

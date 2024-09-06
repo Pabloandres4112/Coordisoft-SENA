@@ -20,31 +20,22 @@ const RegistroSitio = ({ onRegisterSuccess }) => {
     const fetchOptions = async () => {
       try {
         const [personasResponse, tiposResponse] = await Promise.all([
-          axiosClient.get('/auth/me'), // Ajusta esta URL si es necesario
+          axiosClient.get('/auth/me'),
           axiosClient.get('/tipo_sitio/')
         ]);
 
-        // Verifica si personasResponse.data es un array o un objeto
-        if (Array.isArray(personasResponse.data)) {
-          setPersonasOptions(personasResponse.data.map(persona => ({
-            id: persona.id,
-            username: persona.username
-          })));
-        } else if (personasResponse.data && typeof personasResponse.data === 'object') {
-          setPersonasOptions([personasResponse.data].map(persona => ({
-            id: persona.id,
-            username: persona.username
-          })));
-        } else {
-          console.error('La respuesta de personas no es un array o objeto esperado:', personasResponse.data);
-          GlobalAlert.error('Error en la respuesta de personas.');
-        }
+        // Procesa personasResponse
+        const personasData = Array.isArray(personasResponse.data) ? personasResponse.data : [personasResponse.data];
+        setPersonasOptions(personasData.map(persona => ({
+          id: persona.id,
+          username: persona.username
+        })));
 
-        // Verifica que tiposResponse.data sea un array antes de mapear
+        // Procesa tiposResponse
         if (Array.isArray(tiposResponse.data)) {
           setTiposSitioOptions(tiposResponse.data.map(tipo => ({
             id: tipo.id,
-            nombre_tipoSitio: tipo.tipo_movimiento // Ajusta si el nombre del campo es diferente
+            nombre_tipoSitio: tipo.tipo_movimiento
           })));
         } else {
           console.error('La respuesta de tipos de sitio no es un array:', tiposResponse.data);
@@ -66,7 +57,6 @@ const RegistroSitio = ({ onRegisterSuccess }) => {
       return;
     }
 
-    // Asegúrate de que personaEncargada y tipoSitio sean números
     const data = {
       persona_encargada: personaEncargada ? parseInt(personaEncargada, 10) : null,
       nombre_sitio: nombreSitio,
@@ -75,14 +65,14 @@ const RegistroSitio = ({ onRegisterSuccess }) => {
       ficha_tecnica: fichaTecnica
     };
 
-    console.log('Datos enviados:', data); // Mostrar datos en consola
+    console.log('Datos enviados:', data);
 
     try {
       await axiosClient.post('/sitio/', data);
       GlobalAlert.success('Sitio registrado exitosamente!');
       resetForm();
       onClose();
-      if (onRegisterSuccess) onRegisterSuccess(); // Llamar la función de éxito de registro
+      if (onRegisterSuccess) onRegisterSuccess();
     } catch (error) {
       console.error('Error al registrar el sitio:', error.response?.data || error);
       GlobalAlert.error('Hubo un error al registrar el sitio.');
@@ -112,20 +102,21 @@ const RegistroSitio = ({ onRegisterSuccess }) => {
         )}
       >
         <form onSubmit={handleSubmit}>
-          <Select
-            css={{ width: '100%' }}
-            label="Persona Encargada"
-            placeholder="Seleccione la persona encargada"
-            value={personaEncargada}
-            onChange={(value) => setPersonaEncargada(value)}
-            required
-          >
-            {personasOptions.map((persona) => (
-              <SelectItem key={persona.id} value={persona.id.toString()}>
-                {persona.username}
-              </SelectItem>
-            ))}
-          </Select>
+        <Select
+  css={{ width: '100%' }}
+  label="Persona Encargada"
+  placeholder="Seleccione la persona encargada"
+  value={personaEncargada}
+  onChange={(value) => setPersonaEncargada(value)}
+  required
+>
+  {personasOptions.map((persona) => (
+    <SelectItem key={persona.id} value={persona.id.toString()}>
+      {persona.username}
+    </SelectItem>
+  ))}
+</Select>
+
 
           <Input
             label="Nombre del Sitio"
