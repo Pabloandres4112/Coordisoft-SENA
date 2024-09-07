@@ -20,18 +20,16 @@ const RegistroSitio = ({ onRegisterSuccess }) => {
     const fetchOptions = async () => {
       try {
         const [personasResponse, tiposResponse] = await Promise.all([
-          axiosClient.get('/auth/me'),
+          axiosClient.get('/auth/users/'),
           axiosClient.get('/tipo_sitio/')
         ]);
 
-        // Procesa personasResponse
         const personasData = Array.isArray(personasResponse.data) ? personasResponse.data : [personasResponse.data];
         setPersonasOptions(personasData.map(persona => ({
           id: persona.id,
           username: persona.username
         })));
 
-        // Procesa tiposResponse
         if (Array.isArray(tiposResponse.data)) {
           setTiposSitioOptions(tiposResponse.data.map(tipo => ({
             id: tipo.id,
@@ -52,22 +50,36 @@ const RegistroSitio = ({ onRegisterSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validación: Verificar que todos los campos tengan un valor
     if (!personaEncargada || !nombreSitio || !tipoSitio || !ubicacion || !fichaTecnica) {
       setError('Todos los campos son obligatorios');
       return;
     }
 
+    // Aquí se realiza la conversión explícita a número
+    const personaEncargadaNum = Number(personaEncargada);
+    const tipoSitioNum = Number(tipoSitio);
+
+    // Validación adicional para asegurarse de que los IDs son válidos
+    if (!personaEncargadaNum || !tipoSitioNum) {
+      setError('Debe seleccionar una persona encargada y un tipo de sitio válidos.');
+      return;
+    }
+
+    // Preparar los datos para enviarlos
     const data = {
-      persona_encargada: personaEncargada ? parseInt(personaEncargada, 10) : null,
+      persona_encargada: personaEncargadaNum,
       nombre_sitio: nombreSitio,
-      tipo_sitio: tipoSitio ? parseInt(tipoSitio, 10) : null,
+      tipo_sitio: tipoSitioNum,
       ubicacion,
-      ficha_tecnica: fichaTecnica
+      ficha_tecnica: fichaTecnica // Asegurar el nombre correcto
     };
 
     console.log('Datos enviados:', data);
 
     try {
+      // Enviar la solicitud al backend
       await axiosClient.post('/sitio/', data);
       GlobalAlert.success('Sitio registrado exitosamente!');
       resetForm();
@@ -76,6 +88,11 @@ const RegistroSitio = ({ onRegisterSuccess }) => {
     } catch (error) {
       console.error('Error al registrar el sitio:', error.response?.data || error);
       GlobalAlert.error('Hubo un error al registrar el sitio.');
+
+      if (error.response?.data) {
+        // Mostrar error detallado
+        setError('Error: ' + JSON.stringify(error.response.data));
+      }
     }
   };
 
@@ -102,21 +119,20 @@ const RegistroSitio = ({ onRegisterSuccess }) => {
         )}
       >
         <form onSubmit={handleSubmit}>
-        <Select
-  css={{ width: '100%' }}
-  label="Persona Encargada"
-  placeholder="Seleccione la persona encargada"
-  value={personaEncargada}
-  onChange={(value) => setPersonaEncargada(value)}
-  required
->
-  {personasOptions.map((persona) => (
-    <SelectItem key={persona.id} value={persona.id.toString()}>
-      {persona.username}
-    </SelectItem>
-  ))}
-</Select>
-
+          <Select
+            css={{ width: '100%' }}
+            label="Persona Encargada"
+            placeholder="Seleccione la persona encargada"
+            value={personaEncargada}
+            onChange={(value) => setPersonaEncargada(value)} // Mantener la cadena
+            required
+          >
+            {personasOptions.map((persona) => (
+              <SelectItem key={persona.id} value={persona.id.toString()}>
+                {persona.username}
+              </SelectItem>
+            ))}
+          </Select>
 
           <Input
             label="Nombre del Sitio"
@@ -131,7 +147,7 @@ const RegistroSitio = ({ onRegisterSuccess }) => {
             label="Tipo de Sitio"
             placeholder="Seleccione el tipo de sitio"
             value={tipoSitio}
-            onChange={(value) => setTipoSitio(value)}
+            onChange={(value) => setTipoSitio(value)} // Mantener la cadena
             required
           >
             {tiposSitioOptions.map((tipo) => (

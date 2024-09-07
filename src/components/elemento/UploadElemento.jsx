@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, Input, Select, SelectItem, Checkbox } from '@nextui-org/react';
 import GlobalModal from '../componets_globals/GlobalModal';
 
-const UpdateElementModal = ({ isOpen, onOpenChange, item, onUpdate, categorias, tiposMaterial, sites }) => {
+const UpdateElementModal = ({ isOpen, onOpenChange, item, onUpdate, categorias = [], tiposMaterial = [], sites = [] }) => {
   const [updatedData, setUpdatedData] = useState({ ...item });
 
   const handleChange = (e) => {
@@ -54,11 +54,15 @@ const UpdateElementModal = ({ isOpen, onOpenChange, item, onUpdate, categorias, 
           onChange={(e) => handleChange({ target: { name: 'sitio', value: e.target.value } })}
           value={updatedData.sitio}
         >
-          {sites.map((site) => (
-            <SelectItem key={site.id} value={site.id.toString()}>
-              {site.nombre_sitio}
-            </SelectItem>
-          ))}
+          {Array.isArray(sites) && sites.length > 0 ? (
+            sites.map((site) => (
+              <SelectItem key={site.id} value={site.id.toString()}>
+                {site.nombre_sitio}
+              </SelectItem>
+            ))
+          ) : (
+            <SelectItem disabled>No hay sitios disponibles</SelectItem>
+          )}
         </Select>
         <Select
           name="Categoria_Material"
@@ -67,11 +71,15 @@ const UpdateElementModal = ({ isOpen, onOpenChange, item, onUpdate, categorias, 
           onChange={(e) => handleChange({ target: { name: 'Categoria_Material', value: e.target.value } })}
           value={updatedData.Categoria_Material}
         >
-          {categorias.map((categoria) => (
-            <SelectItem key={categoria.id} value={categoria.id.toString()}>
-              {categoria.nombre_categoria}
-            </SelectItem>
-          ))}
+          {Array.isArray(categorias) && categorias.length > 0 ? (
+            categorias.map((categoria) => (
+              <SelectItem key={categoria.id} value={categoria.id.toString()}>
+                {categoria.nombre_categoria}
+              </SelectItem>
+            ))
+          ) : (
+            <SelectItem disabled>No hay categorías disponibles</SelectItem>
+          )}
         </Select>
         <Select
           name="Tipo_Material"
@@ -80,11 +88,15 @@ const UpdateElementModal = ({ isOpen, onOpenChange, item, onUpdate, categorias, 
           onChange={(e) => handleChange({ target: { name: 'Tipo_Material', value: e.target.value } })}
           value={updatedData.Tipo_Material}
         >
-          {tiposMaterial.map((tipo) => (
-            <SelectItem key={tipo.id} value={tipo.id.toString()}>
-              {tipo.tipo_elemento}
-            </SelectItem>
-          ))}
+          {Array.isArray(tiposMaterial) && tiposMaterial.length > 0 ? (
+            tiposMaterial.map((tipo) => (
+              <SelectItem key={tipo.id} value={tipo.id.toString()}>
+                {tipo.tipo_elemento}
+              </SelectItem>
+            ))
+          ) : (
+            <SelectItem disabled>No hay tipos de material disponibles</SelectItem>
+          )}
         </Select>
         <Input
           label="Nombre Material"
