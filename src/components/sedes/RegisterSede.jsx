@@ -9,6 +9,7 @@ export const RegisterSede = ({ onRegisterSuccess }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [nombreSede, setNombreSede] = useState("");
   const [direccionSede, setDireccionSede] = useState("");
+  //holallslsls
   const [centros, setCentros] = useState([]);
   const [selectedCentro, setSelectedCentro] = useState("");
   const [error, setError] = useState("");
