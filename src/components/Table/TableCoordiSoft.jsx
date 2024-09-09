@@ -26,13 +26,14 @@ const TableCoordiSoft = ({ refreshData, searchTerm }) => {
         // { nombre: 'Acciones' },
     ];
 
+    // Función para listar movimientos
     const ListarMovimientos = async () => {
         try {
             const response = await axios.get('http://127.0.0.1:8000/api/movimiento');
             setMovimientos(response.data);
             console.log(response.data);
         } catch (error) {
-            console.log(error);
+            console.error("Error al obtener los movimientos:", error);
         }
     };
 
@@ -40,7 +41,7 @@ const TableCoordiSoft = ({ refreshData, searchTerm }) => {
         ListarMovimientos();
     }, [refreshData]);
 
-    // Filtrar los movimientos basados en el término de búsqueda
+    // Filtrar movimientos basados en el término de búsqueda
     const filteredMovimientos = movimientos.filter((movimiento) =>
         movimiento.id.toString().includes(searchTerm.toLowerCase()) ||
         movimiento.persona_movimiento.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -69,7 +70,7 @@ const TableCoordiSoft = ({ refreshData, searchTerm }) => {
 
     return (
         <>
-            <Table aria-label="Example static collection table">
+            <Table aria-label="Tabla de Movimientos">
                 <TableHeader>
                     {columnsHeader.map((column, index) => (
                         <TableColumn key={index}>{column.nombre}</TableColumn>
@@ -93,7 +94,6 @@ const TableCoordiSoft = ({ refreshData, searchTerm }) => {
                                 >
                                     <FaEdit />
                                 </Button>
-
                             </TableCell> */}
                         </TableRow>
                     ))}
@@ -108,7 +108,7 @@ const TableCoordiSoft = ({ refreshData, searchTerm }) => {
                     color="primary"
                     page={currentPage}
                     total={Math.ceil(filteredMovimientos.length / itemsPerPage)}
-                    onChange={(page) => paginate(page)}
+                    onChange={paginate}
                 />
             </div>
         </>
@@ -116,3 +116,4 @@ const TableCoordiSoft = ({ refreshData, searchTerm }) => {
 };
 
 export default TableCoordiSoft;
+    
