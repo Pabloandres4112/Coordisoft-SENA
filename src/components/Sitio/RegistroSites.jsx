@@ -7,15 +7,20 @@ import { useDisclosure } from '@nextui-org/react';
 
 const RegistroSitio = ({ onRegisterSuccess }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [personaEncargada, setPersonaEncargada] = useState("");
-  const [nombreSitio, setNombreSitio] = useState("");
-  const [tipoSitio, setTipoSitio] = useState("");
-  const [ubicacion, setUbicacion] = useState("");
-  const [fichaTecnica, setFichaTecnica] = useState("");
+  
+  const [formData, setFormData] = useState({
+    persona_encargada: "", // Ensure this is a valid ID
+    nombre_sitio: "",
+    tipo_sitio: "", // Ensure this is a valid ID
+    ubicacion: "",
+    ficha_tecnica: ""
+  });
+    
   const [tiposSitioOptions, setTiposSitioOptions] = useState([]);
   const [personasOptions, setPersonasOptions] = useState([]);
   const [error, setError] = useState("");
 
+  // Cargar opciones de personas y tipos de sitio
   useEffect(() => {
     const fetchOptions = async () => {
       try {
@@ -24,21 +29,8 @@ const RegistroSitio = ({ onRegisterSuccess }) => {
           axiosClient.get('/tipo_sitio/')
         ]);
 
-        const personasData = Array.isArray(personasResponse.data) ? personasResponse.data : [personasResponse.data];
-        setPersonasOptions(personasData.map(persona => ({
-          id: persona.id,
-          username: persona.username
-        })));
-
-        if (Array.isArray(tiposResponse.data)) {
-          setTiposSitioOptions(tiposResponse.data.map(tipo => ({
-            id: tipo.id,
-            nombre_tipoSitio: tipo.tipo_movimiento
-          })));
-        } else {
-          console.error('La respuesta de tipos de sitio no es un array:', tiposResponse.data);
-          GlobalAlert.error('Error en la respuesta de tipos de sitio.');
-        }
+        setPersonasOptions(personasResponse.data);
+        setTiposSitioOptions(tiposResponse.data);
       } catch (error) {
         console.error('Error al obtener opciones:', error);
         GlobalAlert.error('Hubo un error al obtener las opciones.');
@@ -48,61 +40,46 @@ const RegistroSitio = ({ onRegisterSuccess }) => {
     fetchOptions();
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Validación: Verificar que todos los campos tengan un valor
-    if (!personaEncargada || !nombreSitio || !tipoSitio || !ubicacion || !fichaTecnica) {
-      setError('Todos los campos son obligatorios');
-      return;
-    }
-
-    // Aquí se realiza la conversión explícita a número
-    const personaEncargadaNum = Number(personaEncargada);
-    const tipoSitioNum = Number(tipoSitio);
-
-    // Validación adicional para asegurarse de que los IDs son válidos
-    if (!personaEncargadaNum || !tipoSitioNum) {
-      setError('Debe seleccionar una persona encargada y un tipo de sitio válidos.');
-      return;
-    }
-
-    // Preparar los datos para enviarlos
-    const data = {
-      persona_encargada: personaEncargadaNum,
-      nombre_sitio: nombreSitio,
-      tipo_sitio: tipoSitioNum,
-      ubicacion,
-      ficha_tecnica: fichaTecnica // Asegurar el nombre correcto
-    };
-
-    console.log('Datos enviados:', data);
-
-    try {
-      // Enviar la solicitud al backend
-      await axiosClient.post('/sitio/', data);
-      GlobalAlert.success('Sitio registrado exitosamente!');
-      resetForm();
-      onClose();
-      if (onRegisterSuccess) onRegisterSuccess();
-    } catch (error) {
-      console.error('Error al registrar el sitio:', error.response?.data || error);
-      GlobalAlert.error('Hubo un error al registrar el sitio.');
-
-      if (error.response?.data) {
-        // Mostrar error detallado
-        setError('Error: ' + JSON.stringify(error.response.data));
-      }
-    }
+  // Actualizar estado de los selects y inputs
+  const handleSelectChange = (name, value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: Number(value) // El backend espera un número
+    }));
   };
 
+  const handleInputChange = (name, value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+  };
+
+  // Resetear el formulario
   const resetForm = () => {
-    setPersonaEncargada('');
-    setNombreSitio('');
-    setTipoSitio('');
-    setUbicacion('');
-    setFichaTecnica('');
-    setError('');
+    setFormData({
+      persona_encargada: "",
+      nombre_sitio: "",
+      tipo_sitio: "",
+      ubicacion: "",
+      ficha_tecnica: ""
+    });
+    setError("");
+  };
+
+  // Enviar formulario
+  const handleSubmit = async () => {
+    
+    try {
+      await axiosClient.post('/sitio/', formData);
+      GlobalAlert.success('Sitio registrado exitosamente');
+      resetForm();
+      onRegisterSuccess?.(); // Callback opcional al registrar con éxito
+      onClose();
+    } catch (error) {
+      console.error('Error al registrar el sitio:', error);
+      GlobalAlert.error('Hubo un error al registrar el sitio.');
+    }
   };
 
   return (
@@ -113,70 +90,72 @@ const RegistroSitio = ({ onRegisterSuccess }) => {
         onOpenChange={onClose}
         title="Formulario de Registro de Sitio"
         footer={() => (
-          <Button color="danger" variant="light" onClick={onClose}>
-            Cerrar
-          </Button>
+          <>
+            <Button color="danger" variant="light" onClick={onClose}>Cerrar</Button>
+            <Button color="success" variant="solid" onClick={handleSubmit}>Registrar</Button>
+          </>
         )}
       >
-        <form onSubmit={handleSubmit}>
+        <div className="flex flex-col gap-4">
+          {/* Selector de Persona encargada */}
           <Select
-            css={{ width: '100%' }}
             label="Persona Encargada"
             placeholder="Seleccione la persona encargada"
-            value={personaEncargada}
-            onChange={(value) => setPersonaEncargada(value)} // Mantener la cadena
+            onChange={(value) => handleSelectChange('persona_encargada', value)}
+            value={formData.persona_encargada}
             required
           >
             {personasOptions.map((persona) => (
               <SelectItem key={persona.id} value={persona.id.toString()}>
-                {persona.username}
+                {persona.first_name} {persona.last_name}
               </SelectItem>
             ))}
           </Select>
 
+          {/* Input de Nombre del sitio */}
           <Input
             label="Nombre del Sitio"
-            placeholder="Ingrese el nombre del sitio"
-            value={nombreSitio}
-            onChange={(e) => setNombreSitio(e.target.value)}
+            placeholder="Escribe el nombre del sitio"
+            value={formData.nombre_sitio}
+            onChange={(e) => handleInputChange('nombre_sitio', e.target.value)}
             required
           />
 
+          {/* Selector de Tipo de sitio */}
           <Select
-            css={{ width: '100%' }}
             label="Tipo de Sitio"
             placeholder="Seleccione el tipo de sitio"
-            value={tipoSitio}
-            onChange={(value) => setTipoSitio(value)} // Mantener la cadena
+            onChange={(value) => handleSelectChange('tipo_sitio', value)}
+            value={formData.tipo_sitio}
             required
           >
             {tiposSitioOptions.map((tipo) => (
-              <SelectItem key={tipo.id} value={tipo.id.toString()}>
-                {tipo.nombre_tipoSitio}
+              <SelectItem key={tipo.id} value={tipo.id}>
+                {tipo.tipo_movimiento}
               </SelectItem>
             ))}
           </Select>
 
+          {/* Input de Ubicación */}
           <Input
             label="Ubicación"
-            placeholder="Ingrese la ubicación"
-            value={ubicacion}
-            onChange={(e) => setUbicacion(e.target.value)}
+            placeholder="Escribe la ubicación"
+            value={formData.ubicacion}
+            onChange={(e) => handleInputChange('ubicacion', e.target.value)}
             required
           />
 
+          {/* Input de Ficha técnica */}
           <Input
             label="Ficha Técnica"
-            placeholder="Ingrese la ficha técnica"
-            value={fichaTecnica}
-            onChange={(e) => setFichaTecnica(e.target.value)}
+            placeholder="Escribe la ficha técnica"
+            value={formData.ficha_tecnica}
+            onChange={(e) => handleInputChange('ficha_tecnica', e.target.value)}
             required
           />
 
           {error && <p className="text-red-500">{error}</p>}
-
-          <Button type="submit">Registrar</Button>
-        </form>
+        </div>
       </GlobalModal>
     </div>
   );

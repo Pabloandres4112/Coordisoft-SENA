@@ -12,12 +12,6 @@ export const FichaPage = () => {
   const columns = [
     'id',
     'persona_ficha.username',
-    'persona_ficha.email',
-    'persona_ficha.Cedula_persona',
-    'persona_ficha.Edad_persona',
-    'persona_ficha.Telefono_persona',
-    'persona_ficha.first_name',
-    'persona_ficha.last_name',
     'programa.nombre_programa',
     'programa.area_programa.nombre_area',
     'date_created',
