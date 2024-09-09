@@ -26,7 +26,7 @@ const UpdateCentro = ({ isOpen, onOpenChange, item, onUpdate }) => {
     };
 
     fetchMunicipios();
-  }, [item.municipio?.id]);
+  }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -50,10 +50,6 @@ const UpdateCentro = ({ isOpen, onOpenChange, item, onUpdate }) => {
     }
   };
 
-  const handleMunicipioChange = (value) => {
-    setSelectedMunicipio(value);
-  };
-
   return (
     <GlobalModal
       isOpen={isOpen}
@@ -74,7 +70,7 @@ const UpdateCentro = ({ isOpen, onOpenChange, item, onUpdate }) => {
             label="Selecciona un municipio"
             placeholder="Seleccione un municipio"
             value={selectedMunicipio}
-            onChange={handleMunicipioChange}
+            onChange={(e) => setSelectedMunicipio(e.target.value)}
             required
           >
             {municipios.map((municipio) => (

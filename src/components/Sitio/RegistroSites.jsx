@@ -69,7 +69,6 @@ const RegistroSitio = ({ onRegisterSuccess }) => {
 
   // Enviar formulario
   const handleSubmit = async () => {
-    
     try {
       await axiosClient.post('/sitio/', formData);
       GlobalAlert.success('Sitio registrado exitosamente');
@@ -130,7 +129,7 @@ const RegistroSitio = ({ onRegisterSuccess }) => {
             required
           >
             {tiposSitioOptions.map((tipo) => (
-              <SelectItem key={tipo.id} value={tipo.id}>
+              <SelectItem key={tipo.id} value={tipo.id.toString()}>
                 {tipo.tipo_movimiento}
               </SelectItem>
             ))}
